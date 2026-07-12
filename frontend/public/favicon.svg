@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Background Gradient: SLTC Blue to Deep Indigo -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a8a" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    
+    <!-- Accent Gradient: SLTC Yellow/Gold -->
+    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="100%" stop-color="#eab308" />
+    </linearGradient>
+
+    <!-- Steaming Gradient -->
+    <linearGradient id="steam-grad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#60a5fa" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Squircle -->
+  <rect width="512" height="512" rx="128" fill="url(#bg-grad)" />
+
+  <!-- Outer Ring (Subtle Glow) -->
+  <rect x="16" y="16" width="480" height="480" rx="112" fill="none" stroke="#2563eb" stroke-width="8" stroke-opacity="0.4" />
+
+  <!-- Food Cloche (Plate Cover) Group -->
+  <g transform="translate(0, -20)">
+    <!-- Steam / Aroma lines -->
+    <path d="M 216 130 C 206 100, 226 90, 216 60" stroke="url(#steam-grad)" stroke-width="12" stroke-linecap="round" fill="none" />
+    <path d="M 256 120 C 246 85, 266 75, 256 45" stroke="url(#steam-grad)" stroke-width="12" stroke-linecap="round" fill="none" />
+    <path d="M 296 130 C 286 100, 306 90, 296 60" stroke="url(#steam-grad)" stroke-width="12" stroke-linecap="round" fill="none" />
+
+    <!-- Cloche Handle -->
+    <circle cx="256" cy="160" r="18" fill="url(#accent-grad)" />
+
+    <!-- Cloche Dome -->
+    <path d="M 128 300 A 128 128 0 0 1 384 300 Z" fill="#ffffff" />
+    <path d="M 128 300 A 128 128 0 0 1 384 300 Z" fill="none" stroke="#dbeafe" stroke-width="4" />
+
+    <!-- Cloche Base Plate -->
+    <rect x="108" y="306" width="296" height="24" rx="12" fill="url(#accent-grad)" />
+  </g>
+
+  <!-- Cursor Pointer (Click) -->
+  <!-- A modern, sharp mouse pointer clicking from the bottom right -->
+  <g transform="translate(300, 280) scale(0.9)">
+    <!-- Shadow for depth -->
+    <path d="M 12 12 L 112 72 L 64 84 L 108 156 L 80 172 L 36 100 L 12 124 Z" fill="#020617" opacity="0.5" transform="translate(4, 4)" />
+    <!-- White border -->
+    <path d="M 12 12 L 112 72 L 64 84 L 108 156 L 80 172 L 36 100 L 12 124 Z" fill="#ffffff" stroke="#1e293b" stroke-width="8" stroke-linejoin="round" />
+    <!-- Yellow/Orange Click Arrow -->
+    <path d="M 12 12 L 112 72 L 64 84 L 108 156 L 80 172 L 36 100 L 12 124 Z" fill="url(#accent-grad)" />
+    
+    <!-- Click ripple effect rings -->
+    <circle cx="12" cy="12" r="32" fill="none" stroke="#facc15" stroke-width="6" opacity="0.8" stroke-dasharray="10 6" />
+    <circle cx="12" cy="12" r="56" fill="none" stroke="#facc15" stroke-width="4" opacity="0.4" stroke-dasharray="8 8" />
+  </g>
+</svg>

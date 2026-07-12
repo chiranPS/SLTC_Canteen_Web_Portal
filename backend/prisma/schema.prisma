@@ -1,0 +1,239 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  engineType    = "library"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-1.1.x", "rhel-openssl-3.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "debian-openssl-1.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// --- ENUMS ---
+
+enum TokenType {
+  REFRESH
+  RESET_PASSWORD
+  VERIFY_EMAIL
+}
+
+enum Role {
+  STUDENT
+  STAFF
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  PREPARING
+  READY
+  COLLECTED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+}
+
+// --- MODELS ---
+
+model User {
+  id              String         @id @default(uuid())
+  name            String
+  universityId    String         @unique @map("university_id")
+  email           String         @unique
+  passwordHash    String         @map("password_hash")
+  role            Role           @default(STUDENT)
+  isEmailVerified Boolean        @default(false) @map("is_email_verified")
+  phoneNumber     String?        @map("phone_number")
+  nic             String?
+  address         String?        @db.Text
+  
+  orders          Order[]
+  notifications   Notification[]
+  tokens          Token[]
+  cart            Cart?
+  
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  @@index([email])
+  @@index([universityId])
+  @@map("users")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?  @db.Text
+  isActive    Boolean  @default(true) @map("is_active")
+  dailyLimit  Int      @default(0) @map("daily_limit")
+  
+  meals       Meal[]
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("categories")
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  token     String    @unique
+  type      TokenType
+  userId    String    @map("user_id")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  expiresAt DateTime  @map("expires_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  
+  @@index([userId])
+  @@index([token])
+  @@map("tokens")
+}
+
+model Meal {
+  id          String       @id @default(uuid())
+  categoryId  String       @map("category_id")
+  category    Category     @relation(fields: [categoryId], references: [id])
+  
+  name        String
+  description String?      @db.Text
+  price       Decimal      @db.Decimal(10, 2)
+  isAvailable Boolean      @default(true) @map("is_available")
+  imageUrl    String?      @map("image_url")
+  
+  orderItems  OrderItem[]
+  cartItems   CartItem[]
+  
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@index([categoryId])
+  @@index([isAvailable])
+  @@map("meals")
+}
+
+model Order {
+  id          String       @id @default(uuid())
+  orderNumber String       @unique @map("order_number")
+  userId      String       @map("user_id")
+  user        User         @relation(fields: [userId], references: [id])
+  
+  totalAmount Decimal      @map("total_amount") @db.Decimal(10, 2)
+  status      OrderStatus  @default(PENDING)
+  pickupTime  DateTime     @map("pickup_time")
+  qrString    String?      @db.Text @map("qr_string")
+  
+  orderItems  OrderItem[]
+  payment     Payment?     
+  
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([status])
+  @@index([pickupTime])
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String   @map("order_id")
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  mealId      String   @map("meal_id")
+  meal        Meal     @relation(fields: [mealId], references: [id])
+  
+  quantity    Int
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(10, 2)
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([orderId])
+  @@index([mealId])
+  @@map("order_items")
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  orderId       String        @unique @map("order_id")
+  order         Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  
+  amount        Decimal       @db.Decimal(10, 2)
+  status        PaymentStatus @default(PENDING)
+  transactionId String?       @map("transaction_id")
+  
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@map("payments")
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String
+  message     String   @db.Text
+  type        String   @default("INFO")
+  isRead      Boolean  @default(false) @map("is_read")
+  
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique @map("user_id")
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  items     CartItem[]
+  
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  @@map("carts")
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String   @map("cart_id")
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  
+  mealId    String   @map("meal_id")
+  meal      Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  
+  quantity  Int
+  
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([cartId])
+  @@index([mealId])
+  @@map("cart_items")
+}
+
+model SystemSettings {
+  id               String   @id @default("singleton")
+  isOrderingPaused Boolean  @default(false) @map("is_ordering_paused")
+  pauseMessage     String?  @db.Text @map("pause_message")
+  
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
+
