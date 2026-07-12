@@ -1,0 +1,80 @@
+name: CI/CD Deploys to cPanel
+
+on:
+  push:
+    branches:
+      - main  # Triggers the workflow whenever you push to the main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download the repository code to the runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # --- BUILD FRONTEND ---
+      - name: Build Frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      # --- BUILD BACKEND ---
+      - name: Build Backend
+        run: |
+          cd backend
+          npm ci
+          npm run build
+
+      # --- DEPLOY FRONTEND TO PUBLIC_HTML ---
+      - name: Deploy Frontend to cPanel
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: ${{ secrets.SFTP_PORT }}
+          protocol: sftp
+          local-dir: ./frontend/dist/
+          server-dir: /public_html/
+          dangerous-clean-slate: false  # Safe: doesn't delete other files like .well-known or api.click2eat.xyz
+
+      # --- DEPLOY BACKEND TO NODEAPP ---
+      - name: Deploy Backend to cPanel
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: ${{ secrets.SFTP_PORT }}
+          protocol: sftp
+          local-dir: ./backend/dist/
+          server-dir: /nodeapp/dist/
+          dangerous-clean-slate: false
+
+      # --- TRIGGER PASSENGER RESTART ---
+      # Passenger automatically restarts the application when a file named tmp/restart.txt is created or modified.
+      - name: Trigger App Restart
+        run: |
+          mkdir -p tmp
+          echo "$(date)" > tmp/restart.txt
+      
+      - name: Upload Restart Trigger
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: ${{ secrets.SFTP_PORT }}
+          protocol: sftp
+          local-dir: ./tmp/
+          server-dir: /nodeapp/tmp/
+          dangerous-clean-slate: false
