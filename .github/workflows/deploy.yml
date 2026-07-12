@@ -36,45 +36,37 @@ jobs:
 
       # --- DEPLOY FRONTEND TO PUBLIC_HTML ---
       - name: Deploy Frontend to cPanel
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.SFTP_HOST }}
+          host: ${{ secrets.SFTP_HOST }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
-          protocol: sftp
-          local-dir: ./frontend/dist/
-          server-dir: /public_html/
-          dangerous-clean-slate: false  # Safe: doesn't delete other files like .well-known or api.click2eat.xyz
+          source: "frontend/dist/**"
+          target: "/home/clickeat/public_html"
+          strip_components: 2
 
       # --- DEPLOY BACKEND TO NODEAPP ---
       - name: Deploy Backend to cPanel
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        uses: appleboy/scp-action@v0.1.7
         with:
-          server: ${{ secrets.SFTP_HOST }}
+          host: ${{ secrets.SFTP_HOST }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
-          protocol: sftp
-          local-dir: ./backend/dist/
-          server-dir: /nodeapp/dist/
-          dangerous-clean-slate: false
+          source: "backend/dist/**"
+          target: "/home/clickeat/nodeapp"
+          strip_components: 2
 
       # --- TRIGGER PASSENGER RESTART ---
-      # Passenger automatically restarts the application when a file named tmp/restart.txt is created or modified.
-      - name: Trigger App Restart
-        run: |
-          mkdir -p tmp
-          echo "$(date)" > tmp/restart.txt
-      
-      - name: Upload Restart Trigger
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      - name: Restart Node.js Application
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          server: ${{ secrets.SFTP_HOST }}
+          host: ${{ secrets.SFTP_HOST }}
           username: ${{ secrets.SFTP_USERNAME }}
           password: ${{ secrets.SFTP_PASSWORD }}
           port: ${{ secrets.SFTP_PORT }}
-          protocol: sftp
-          local-dir: ./tmp/
-          server-dir: /nodeapp/tmp/
-          dangerous-clean-slate: false
+          script: |
+            mkdir -p /home/clickeat/nodeapp/tmp
+            touch /home/clickeat/nodeapp/tmp/restart.txt
+
