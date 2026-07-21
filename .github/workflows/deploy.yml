@@ -35,6 +35,21 @@ jobs:
           npm run build
           cp package.json dist/
           cp -r prisma dist/
+          npm install --omit=dev --prefix dist/
+          npx prisma generate --schema dist/prisma/schema.prisma
+          
+          # Package the distribution folder
+          cd dist
+          zip -r ../backend.zip .
+          cd ..
+          
+          # Prepare deploy directory for zip
+          mkdir deploy-backend
+          mv backend.zip deploy-backend/
+          
+          # Prepare deploy directory for PHP trigger
+          mkdir deploy-php
+          cp scripts/unzip.php deploy-php/
 
       # --- DEPLOY FRONTEND TO PUBLIC_HTML ---
       - name: Deploy Frontend to cPanel
@@ -49,8 +64,8 @@ jobs:
           server-dir: /public_html/
           dangerous-clean-slate: false  # Safe: doesn't delete other files like .well-known or api.click2eat.xyz
 
-      # --- DEPLOY BACKEND TO NODEAPP ---
-      - name: Deploy Backend to cPanel
+      # --- DEPLOY BACKEND ZIP TO NODEAPP ---
+      - name: Deploy Backend Zip to cPanel
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.SFTP_HOST }}
@@ -58,9 +73,32 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: 21
           protocol: ftps
-          local-dir: ./backend/dist/
+          local-dir: ./backend/deploy-backend/
           server-dir: /nodeapp/
           dangerous-clean-slate: false
+
+      # --- UPLOAD UNZIP TRIGGER TO PUBLIC_HTML ---
+      - name: Upload Unzip Trigger to cPanel
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USERNAME }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          port: 21
+          protocol: ftps
+          local-dir: ./backend/deploy-php/
+          server-dir: /public_html/
+          dangerous-clean-slate: false
+
+      # --- RUN UNZIP TRIGGER ON SERVER ---
+      - name: Extract Deployed Backend
+        run: |
+          RESPONSE=$(curl -s https://click2eat.xyz/unzip.php)
+          echo "Server Response: $RESPONSE"
+          if [ "$RESPONSE" != "UNZIP_SUCCESS" ]; then
+            echo "Error: Unzipping backend failed on the server!"
+            exit 1
+          fi
 
       # --- TRIGGER PASSENGER RESTART ---
       # Passenger automatically restarts the application when a file named tmp/restart.txt is created or modified.
