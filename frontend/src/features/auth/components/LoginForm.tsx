@@ -5,6 +5,7 @@ import { authApi } from '../api/auth.api';
 import { useAuth } from '../../../context/AuthContext';
 import { Input } from '../../../components/ui/Input';
 import { Button } from '../../../components/ui/Button';
+import { Eye, EyeOff } from 'lucide-react';
 
 interface LoginFormProps {
   emailLabel?: string;
@@ -17,6 +18,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -63,11 +65,21 @@ export const LoginForm: React.FC<LoginFormProps> = ({
       />
       <Input
         label="Password"
-        type="password"
+        type={showPassword ? "text" : "password"}
         placeholder="••••••••"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        rightElement={
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="text-gray-400 hover:text-gray-600 transition-colors focus:outline-none flex items-center justify-center h-full"
+            title={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        }
       />
       <Button type="submit" className="w-full" size="lg" isLoading={isLoading}>
         Sign In
@@ -75,3 +87,4 @@ export const LoginForm: React.FC<LoginFormProps> = ({
     </form>
   );
 };
+
