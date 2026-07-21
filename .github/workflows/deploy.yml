@@ -35,13 +35,16 @@ jobs:
           cd backend
           npm ci
           npm run build
-          cp package.json dist/
-          cp -r prisma dist/
-          # Install only production dependencies directly into dist/
-          cd dist
+          # Prune devDependencies in backend/ to leave only production ones
           npm install --omit=dev
-          # Generate Prisma client for the cPanel Linux target
-          npx prisma generate --schema prisma/schema.prisma
+          # Generate Prisma client for all target platforms (including cPanel's Linux)
+          npx prisma generate
+          # Create a deploy folder mimicking the server layout
+          mkdir deploy-backend
+          cp -r dist deploy-backend/
+          cp package.json deploy-backend/
+          cp -r prisma deploy-backend/
+          cp -r node_modules deploy-backend/
 
       # --- DEPLOY FRONTEND TO PUBLIC_HTML ---
       - name: Deploy Frontend to cPanel
@@ -67,7 +70,7 @@ jobs:
           password: ${{ secrets.SFTP_PASSWORD }}
           port: 21
           protocol: ftps
-          local-dir: ./backend/dist/
+          local-dir: ./backend/deploy-backend/
           server-dir: /nodeapp/
           dangerous-clean-slate: false
 
