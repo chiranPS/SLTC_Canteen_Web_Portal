@@ -1,3 +1,5 @@
+process.env.TOKIO_WORKER_THREADS = '1';
+process.env.UV_THREADPOOL_SIZE = '1';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import path from 'path';
