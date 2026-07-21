@@ -17,7 +17,7 @@ export const OrderHistory: React.FC = () => {
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ['orders-history'],
     queryFn: ordersApi.getHistory,
-    refetchInterval: 10000, // Auto-refresh order statuses every 10s
+    refetchInterval: 60000, // Auto-refresh order statuses every 60s
   });
 
   const getStatusBadge = (status: string) => {

@@ -25,7 +25,7 @@ export const MenuBrowser: React.FC = () => {
   const { data: settings } = useQuery({
     queryKey: ['system-settings'],
     queryFn: getSystemSettings,
-    refetchInterval: 30000,
+    refetchInterval: 120000,
   });
 
   React.useEffect(() => {

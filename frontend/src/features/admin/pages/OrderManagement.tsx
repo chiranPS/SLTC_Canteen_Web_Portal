@@ -15,7 +15,7 @@ export const OrderManagement: React.FC = () => {
   const { data, isLoading } = useQuery({
     queryKey: ['admin-orders'],
     queryFn: () => adminApi.getAllOrders({ limit: 100 }), // Get recent 100 for live board
-    refetchInterval: 15000, // Poll every 15s
+    refetchInterval: 45000, // Poll every 45s
   });
 
   const orders = data?.orders || [];

@@ -11,7 +11,7 @@ export const AdminDashboard: React.FC = () => {
   const { data: metrics, isLoading: isLoadingMetrics } = useQuery({
     queryKey: ['admin-metrics'],
     queryFn: adminApi.getDashboardMetrics,
-    refetchInterval: 30000,
+    refetchInterval: 120000,
   });
 
   const { data: popularMeals = [], isLoading: isLoadingMeals } = useQuery({
