@@ -45,6 +45,8 @@ jobs:
           cp package.json deploy-backend/
           cp -r prisma deploy-backend/
           cp -r node_modules deploy-backend/
+          cp .env.production deploy-backend/.env
+          cp scripts/test-db.js deploy-backend/
 
       # --- DEPLOY FRONTEND TO PUBLIC_HTML ---
       - name: Deploy Frontend to cPanel
