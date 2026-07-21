@@ -1,0 +1,2 @@
+# Disable Phusion Passenger for the deploy folder to prevent 503 errors and allow direct PHP execution
+PassengerEnabled off

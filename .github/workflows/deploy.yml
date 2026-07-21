@@ -48,8 +48,9 @@ jobs:
           mv backend.zip deploy-backend/
           
           # Prepare deploy directory for PHP trigger
-          mkdir deploy-php
-          cp scripts/unzip.php deploy-php/
+          mkdir -p deploy-php/deploy
+          cp scripts/unzip.php deploy-php/deploy/
+          cp scripts/.htaccess deploy-php/deploy/
 
       # --- DEPLOY FRONTEND TO PUBLIC_HTML ---
       - name: Deploy Frontend to cPanel
@@ -93,7 +94,7 @@ jobs:
       # --- RUN UNZIP TRIGGER ON SERVER ---
       - name: Extract Deployed Backend
         run: |
-          RESPONSE=$(curl -s https://click2eat.xyz/unzip.php)
+          RESPONSE=$(curl -s https://click2eat.xyz/deploy/unzip.php)
           echo "Server Response: $RESPONSE"
           if [ "$RESPONSE" != "UNZIP_SUCCESS" ]; then
             echo "Error: Unzipping backend failed on the server!"

@@ -1,5 +1,5 @@
 <?php
-// Simple extraction script to bypass CloudLinux LVE limits when running npm install on cPanel.
+// Simple extraction script to bypass CloudLinux LVE limits and Passenger interceptions.
 $zip = new ZipArchive;
 if ($zip->open('/home/clickeat/nodeapp/backend.zip') === TRUE) {
     // Extract everything to the nodeapp directory
@@ -13,6 +13,10 @@ if ($zip->open('/home/clickeat/nodeapp/backend.zip') === TRUE) {
     echo 'UNZIP_FAILED';
 }
 
-// Delete this script after execution for security
+// Clean up deployment folder
+if (file_exists(__DIR__ . '/.htaccess')) {
+    unlink(__DIR__ . '/.htaccess');
+}
 unlink(__FILE__);
+rmdir(__DIR__);
 ?>
