@@ -50,6 +50,19 @@ export const MenuBrowser: React.FC = () => {
 
   const meals = mealsData?.meals || [];
 
+  // Preferred display order for category pills
+  const CATEGORY_ORDER = ['Breakfast', 'Lunch', 'Dinner', 'Tea / Beverages'];
+  const sortedCategories = [...categories].sort((a, b) => {
+    const ai = CATEGORY_ORDER.indexOf(a.name);
+    const bi = CATEGORY_ORDER.indexOf(b.name);
+    // Known categories first (in preferred order), unknowns sorted alphabetically after
+    if (ai === -1 && bi === -1) return a.name.localeCompare(b.name);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+
+
   const now = new Date();
   const currentHour = now.getHours();
   const isTimeClosed = currentHour < 5 || currentHour >= 20;
@@ -122,7 +135,7 @@ export const MenuBrowser: React.FC = () => {
               >
                 All Meals
               </button>
-              {categories.map(category => (
+              {sortedCategories.map(category => (
                 <button
                   key={category.id}
                   onClick={() => setActiveCategory(category.id)}

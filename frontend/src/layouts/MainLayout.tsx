@@ -194,7 +194,16 @@ export const MainLayout: React.FC = () => {
         <p className="text-sm font-medium text-gray-400">
           All Rights Reserved 2026 SLTC
           <br />
-          <span className="text-primary-500"> Solution by Chiran Samarasekara</span>
+          <span className="text-primary-500"> Solution by{' '}
+              <a
+                href="https://www.linkedin.com/in/chiran-samarasekara-7a767a29b/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline underline-offset-2 font-semibold"
+              >
+                Chiran Samarasekara
+              </a>
+            </span>
         </p>
       </footer>
     </div>

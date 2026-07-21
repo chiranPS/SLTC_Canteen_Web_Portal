@@ -43,11 +43,11 @@ export const AuthLayout: React.FC = () => {
       </div>
 
       {/* Right side - Form */}
-      <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-white relative">
+      <div className="flex-1 flex flex-col py-12 px-4 sm:px-6 lg:px-20 xl:px-24 bg-white relative">
         {/* Mobile decorative elements */}
         <div className="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-primary-100 blur-3xl opacity-50 z-0 lg:hidden" />
 
-        <div className="mx-auto w-full max-w-sm relative z-10">
+        <div className="mx-auto w-full max-w-sm relative z-10 flex-1 flex flex-col justify-center">
           <div className="text-center mb-10">
             <div className="h-16 flex items-center justify-center mb-6">
               <img src="/logo.png" alt="SLTC Logo" className="h-full object-contain" />
@@ -66,13 +66,23 @@ export const AuthLayout: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-6 left-0 right-0 text-center">
-          <p className="text-sm font-medium text-gray-400">
-            All Rights Reserved 2026 SLTC
-            <span className="text-primary-500"> Solution by Chiran Samarasekara</span>
+        <div className="mt-6 text-center relative z-10">
+          <p className="text-sm font-medium text-gray-400 flex flex-col items-center sm:block">
+            <span>All Rights Reserved 2026 SLTC</span>
+            <span className="text-primary-500 sm:inline sm:ml-1">Solution by{' '}
+              <a
+                href="https://www.linkedin.com/in/chiran-samarasekara-7a767a29b/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline underline-offset-2 font-semibold"
+              >
+                Chiran Samarasekara
+              </a>
+            </span>
           </p>
         </div>
       </div>
     </div>
+
   );
 };
