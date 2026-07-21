@@ -33,6 +33,8 @@ jobs:
           cd backend
           npm ci
           npm run build
+          cp package.json dist/
+          cp -r prisma dist/
 
       # --- DEPLOY FRONTEND TO PUBLIC_HTML ---
       - name: Deploy Frontend to cPanel
