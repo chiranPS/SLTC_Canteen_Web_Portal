@@ -1,9 +1,0 @@
-PORT=5000
-NODE_ENV=production
-DATABASE_URL="mysql://clickeat_chiran_user:Chiran%40123@localhost:3306/clickeat_sltc_campus_canteen_db"
-JWT_SECRET="Zir4YtzO7CScIaPw5qMeJT903xDsRdHEQuUmNf6An8Fblpv2"
-JWT_EXPIRES_IN="7d"
-SMTP_HOST="mail.click2eat.xyz"
-SMTP_PORT=587
-SMTP_USER="noreply@click2eat.xyz"
-SMTP_PASS="Click2eat@smtp"
